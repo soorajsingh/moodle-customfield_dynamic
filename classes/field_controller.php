@@ -49,10 +49,10 @@ class field_controller extends \core_customfield\field_controller {
         $mform->setExpanded('header_specificsettings', true);
 
         $mform->addElement('textarea', 'configdata[dynamicsql]', get_string('sqlquery', 'customfield_dynamic') ,array('rows' => 7, 'cols' => 52));
-        $mform->setType('configdata[dynamicsql]', PARAM_TEXT);
+        $mform->setType('configdata[dynamicsql]', PARAM_RAW);
 
         $mform->addElement('text', 'configdata[defaultvalue]', get_string('defaultvalue', 'core_customfield'), 'size="50"');
-        $mform->setType('configdata[defaultvalue]', PARAM_TEXT);
+        $mform->setType('configdata[defaultvalue]', PARAM_RAW);
     }
 
     /**
@@ -62,9 +62,10 @@ class field_controller extends \core_customfield\field_controller {
      * @return array
      */
     public static function get_options_array(\core_customfield\field_controller $field) : array {
-		global $DB;
-        if ($field->get_configdata_property('dynamicsql')) {
-			$resultset = $DB->get_records_sql($field->get_configdata_property('dynamicsql'));
+        global $DB;
+        if ($field->get_configdata_property('dynamicsql')) 
+        {
+            $resultset = $DB->get_records_sql($field->get_configdata_property('dynamicsql'));
 			$options = array();
 			foreach ($resultset as $key => $option) {
                 $options[format_string($key)] = format_string($option->data);// Multilang formatting.
@@ -92,9 +93,9 @@ class field_controller extends \core_customfield\field_controller {
         global $DB;
         try {
             $sql = $data['configdata']['dynamicsql'];
-            if(!isset($sql) || $sql==''){
+            if (!isset($sql) || $sql==''){
                 $err['configdata[dynamicsql]'] = get_string('err_required', 'form');
-            }else{
+            } else {
                 $resultset = $DB->get_records_sql($sql);
                 if (!$resultset) {
                     $err['configdata[dynamicsql]'] = get_string('queryerrorfalse', 'customfield_dynamic');

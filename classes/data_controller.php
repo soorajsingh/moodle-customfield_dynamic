@@ -79,7 +79,8 @@ class data_controller extends \core_customfield\data_controller {
         }
 
         $elementname = $this->get_form_element_name();
-        $mform->addElement('select', $elementname, $this->get_field()->get_formatted_name(), $formattedoptions);
+        $mform->addElement('select', $elementname, $this->get_field()->get_formatted_name(), 
+        $formattedoptions);
 
         if (($defaultkey = array_search($config['defaultvalue'], $options)) !== false) {
             $mform->setDefault($elementname, $defaultkey);
@@ -123,7 +124,7 @@ class data_controller extends \core_customfield\data_controller {
         $options = field_controller::get_options_array($this->get_field());
         if (array_key_exists($value, $options)) {
             return format_string($options[$value], true,
-                ['context' => $this->get_field()->get_handler()->get_configuration_context()]);
+             ['context' => $this->get_field()->get_handler()->get_configuration_context()]);
         }
 
         return null;
