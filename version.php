@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'customfield_dynamic';
-$plugin->version   = 2020102911;
+$plugin->version   = 2021020712;
 $plugin->requires  = 2019051100;
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = 'Version for Moodle 3.7 onwards';
