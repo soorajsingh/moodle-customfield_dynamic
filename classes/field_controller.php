@@ -82,7 +82,7 @@ class field_controller extends \core_customfield\field_controller {
         } else {
             $options = array();
         }
-        return array_merge([''], $options);
+        return array('' => get_string('choose')) + $options;
     }
 
     /**
