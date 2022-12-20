@@ -71,7 +71,7 @@ class field_controller extends \core_customfield\field_controller {
      * @param \core_customfield\field_controller $field
      * @return array
      */
-    public static function get_options_array(\core_customfield\field_controller $field) : array {
+    public static function get_options_array(\core_customfield\field_controller $field,$multiselect=0) : array {
         global $DB;
         if ($field->get_configdata_property('dynamicsql')) {
             $resultset = $DB->get_records_sql($field->get_configdata_property('dynamicsql'));
@@ -82,7 +82,13 @@ class field_controller extends \core_customfield\field_controller {
         } else {
             $options = array();
         }
-        return array('' => get_string('choose')) + $options;
+        if($multiselect){
+            return $options;
+        }
+        else{
+            return array('' => get_string('choose')) + $options;
+        }
+
     }
 
     /**
