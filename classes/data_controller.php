@@ -54,7 +54,7 @@ class data_controller extends \core_customfield\data_controller {
         $defaultvalue = $this->get_field()->get_configdata_property('defaultvalue');
         $defaultvalues = '';
         if ('' . $defaultvalue !== '') {
-            $options = field_controller::get_options_array($this->get_field());
+            $options = field_controller::get_options_array($this->get_field(),$this->get_field()->get_configdata_property('multiselect'));
             $values = explode(",", $defaultvalue);
             foreach ($values as $value) {
                 $key = array_key_exists($value, $options);
@@ -75,7 +75,7 @@ class data_controller extends \core_customfield\data_controller {
     public function instance_form_definition(\MoodleQuickForm $mform) {
         $field = $this->get_field();
         $config = $field->get('configdata');
-        $options = field_controller::get_options_array($field);
+        $options = field_controller::get_options_array($field,$this->get_field()->get_configdata_property('multiselect'));
         $formattedoptions = array();
         $attributes = array();
         if ($this->get_field()->get_configdata_property('multiselect')) {
@@ -183,7 +183,7 @@ class data_controller extends \core_customfield\data_controller {
             return null;
         }
         $completevalue = '';
-        $options = field_controller::get_options_array($this->get_field());
+        $options = field_controller::get_options_array($this->get_field(),$this->get_field()->get_configdata_property('multiselect'));
         foreach ($value as $val) {
             if (array_key_exists($val, $options)) {
                 $completevalue .= (empty($completevalue) ? '' : ', ') .
