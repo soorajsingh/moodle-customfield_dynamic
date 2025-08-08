@@ -54,7 +54,7 @@ class data_controller extends \core_customfield\data_controller {
         $defaultvalue = $this->get_field()->get_configdata_property('defaultvalue');
         $defaultvalues = '';
         if ('' . $defaultvalue !== '') {
-            $options = field_controller::get_options_array($this->get_field());
+            $options = field_controller::get_options_array($this->get_field(),$this->get_field()->get_configdata_property('multiselect'));
             $values = explode(",", $defaultvalue);
             foreach ($values as $value) {
                 $key = array_key_exists($value, $options);
@@ -75,25 +75,46 @@ class data_controller extends \core_customfield\data_controller {
     public function instance_form_definition(\MoodleQuickForm $mform) {
         $field = $this->get_field();
         $config = $field->get('configdata');
-        $options = field_controller::get_options_array($field);
+
         $formattedoptions = array();
         $attributes = array();
         if ($this->get_field()->get_configdata_property('multiselect')) {
             $attributes = array('multiple' => true);
         }
-        $context = $this->get_field()->get_handler()->get_configuration_context();
-        foreach ($options as $key => $option) {
-            // Multilang formatting with filters.
-            $formattedoptions[$key] = format_string($option, true, ['context' => $context]);
-        }
+
 
         $elementtype = 'select';
         if ($this->get_field()->get_configdata_property('autocomplete')) {
+            $context = $this->get_field()->get_handler()->get_configuration_context();
+            $options = field_controller::get_options_array($field,$field->get_configdata_property('multiselect'));
+            $data = explode(',',$this->get_value());
+            foreach ($options as $key => $option) {
+                // Multilang formatting with filters.
+                if(in_array($key, $data)) {
+                    $formattedoptions[$key] = format_string($option, true, ['context' => $context]);
+                }
+            }
+
             $elementtype = 'autocomplete';
+            $elementname = $this->get_form_element_name();
+            $attributes['ajax'] = 'customfield_dynamic/form_dynamic_options';
+            $attributes['data-instance'] = $field->get('id');
+            $mform->addElement($elementtype, $elementname, $this->get_field()->get_formatted_name(),
+                $formattedoptions, $attributes);
         }
-        $elementname = $this->get_form_element_name();
-        $mform->addElement($elementtype, $elementname, $this->get_field()->get_formatted_name(),
-        $formattedoptions, $attributes);
+        else{
+            $options = field_controller::get_options_array($field,$this->get_field()->get_configdata_property('multiselect'));
+            $context = $this->get_field()->get_handler()->get_configuration_context();
+            foreach ($options as $key => $option) {
+                // Multilang formatting with filters.
+                $formattedoptions[$key] = format_string($option, true, ['context' => $context]);
+            }
+
+            $elementname = $this->get_form_element_name();
+            $mform->addElement($elementtype, $elementname, $this->get_field()->get_formatted_name(),
+                $formattedoptions, $attributes);
+        }
+
 
         if ($field->get_configdata_property('required')) {
             $mform->addRule($elementname, null, 'required', null, 'client');
@@ -108,7 +129,7 @@ class data_controller extends \core_customfield\data_controller {
      *    fields for this instance will be added, otherwise the default values will be added.
      */
     public function instance_form_before_set_data(\stdClass $instance) {
-        $instance->{$this->get_form_element_name()} = implode(',', $this->get_value());
+        $instance->{$this->get_form_element_name()} = $this->get_value();
     }
     /**
      * Saves the data coming from form
@@ -154,11 +175,11 @@ class data_controller extends \core_customfield\data_controller {
      *
      * @return array
      */
-    public function get_value() {
+    public function get_value(): string {
         if (!$this->get('id')) {
-            return explode(',', $this->get_default_value());
+            return $this->get_default_value();
         }
-        return explode(',', $this->get($this->datafield()));
+        return $this->get($this->datafield());
     }
 
     /**
@@ -177,13 +198,13 @@ class data_controller extends \core_customfield\data_controller {
      * @return mixed|null value or null if empty
      */
     public function export_value() {
-        $value = $this->get_value();
+        $value = explode(',', $this->get_value());
 
         if ($this->is_empty($value)) {
             return null;
         }
         $completevalue = '';
-        $options = field_controller::get_options_array($this->get_field());
+        $options = field_controller::get_options_array($this->get_field(),$this->get_field()->get_configdata_property('multiselect'));
         foreach ($value as $val) {
             if (array_key_exists($val, $options)) {
                 $completevalue .= (empty($completevalue) ? '' : ', ') .

@@ -71,18 +71,26 @@ class field_controller extends \core_customfield\field_controller {
      * @param \core_customfield\field_controller $field
      * @return array
      */
-    public static function get_options_array(\core_customfield\field_controller $field) : array {
+    public static function get_options_array(\core_customfield\field_controller $field,$multiselect=0) : array {
         global $DB;
+        $context = \context_system::instance(); // Default to system context if no other context is available
+
         if ($field->get_configdata_property('dynamicsql')) {
             $resultset = $DB->get_records_sql($field->get_configdata_property('dynamicsql'));
             $options = array();
             foreach ($resultset as $key => $option) {
-                $options[format_string($key)] = format_string($option->data);// Multilang formatting.
+                $options[format_string($key,true,["context"=>$context])] = format_string($option->data,true,["context"=>$context]);// Multilang formatting.
             }
         } else {
             $options = array();
         }
-        return array('' => get_string('choose')) + $options;
+        if($multiselect){
+            return $options;
+        }
+        else{
+            return array('' => get_string('choose')) + $options;
+        }
+
     }
 
     /**
