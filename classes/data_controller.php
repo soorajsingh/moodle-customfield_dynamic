@@ -122,7 +122,7 @@ class data_controller extends \core_customfield\data_controller {
             return;
         }
         $value = $datanew->$elementname;
-        if ($this->get_field()->get_configdata_property('multiselect')) {
+        if ($this->get_field()->get_configdata_property('multiselect') && is_array($value)) {
             $value = implode(',', $datanew->$elementname);
         }
 
